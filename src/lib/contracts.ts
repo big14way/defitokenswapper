@@ -1,29 +1,58 @@
-// Uniswap V3 SwapRouter ABI (simplified)
-export const swapRouterAbi = [
+import TokenSwapperABI from './TokenSwapperABI.json';
+
+// TokenSwapper Contract Address (deployed on Base Sepolia)
+export const TOKEN_SWAPPER_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_SWAPPER_ADDRESS || "0x85e3569ef3DDEE12Bb68772d2Cf73612e82e39Ea";
+
+// TokenSwapper ABI
+export const tokenSwapperAbi = TokenSwapperABI;
+
+// ERC20 ABI (for token approvals and balances)
+export const erc20Abi = [
   {
-    inputs: [
-      {
-        components: [
-          { internalType: "address", name: "tokenIn", type: "address" },
-          { internalType: "address", name: "tokenOut", type: "address" },
-          { internalType: "uint24", name: "fee", type: "uint24" },
-          { internalType: "address", name: "recipient", type: "address" },
-          { internalType: "uint256", name: "deadline", type: "uint256" },
-          { internalType: "uint256", name: "amountIn", type: "uint256" },
-          { internalType: "uint256", name: "amountOutMinimum", type: "uint256" },
-          { internalType: "uint160", name: "sqrtPriceLimitX96", type: "uint160" },
-        ],
-        internalType: "struct ISwapRouter.ExactInputSingleParams",
-        name: "params",
-        type: "tuple",
-      },
-    ],
-    name: "exactInputSingle",
-    outputs: [{ internalType: "uint256", name: "amountOut", type: "uint256" }],
-    stateMutability: "payable",
+    constant: true,
+    inputs: [{ name: "_owner", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "balance", type: "uint256" }],
     type: "function",
   },
-];
+  {
+    constant: false,
+    inputs: [
+      { name: "_spender", type: "address" },
+      { name: "_value", type: "uint256" },
+    ],
+    name: "approve",
+    outputs: [{ name: "", type: "bool" }],
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [
+      { name: "_owner", type: "address" },
+      { name: "_spender", type: "address" },
+    ],
+    name: "allowance",
+    outputs: [{ name: "", type: "uint256" }],
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "", type: "uint8" }],
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "symbol",
+    outputs: [{ name: "", type: "string" }],
+    type: "function",
+  },
+] as const;
 
-// Uniswap V3 addresses
-export const UNISWAP_ROUTER_ADDRESS = "0xE592427A0AEce92De3Edee1F18E0157C05861564";
+// Common token addresses on Base Sepolia
+export const TOKENS = {
+  WETH: "0x4200000000000000000000000000000000000006",
+  // Add more tokens as needed for testing
+};

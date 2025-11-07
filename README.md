@@ -42,13 +42,17 @@ A modern DeFi token swapping dApp built with Next.js 14, TypeScript, and integra
    ```
 
 3. Set up environment variables:
-   Copy `.env.example` to `.env.local` and fill in your API keys:
+   Copy `.env.example` to `.env.local` and fill in your values:
    ```bash
    cp .env.example .env.local
    ```
-   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`: Your WalletConnect project ID (provided)
-   - `NEXT_PUBLIC_INFURA_KEY`: Your Infura API key
-   - `NEXT_PUBLIC_ALCHEMY_KEY`: Your Alchemy API key
+   Required variables:
+   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`: Your WalletConnect project ID from https://cloud.walletconnect.com
+   - `NEXT_PUBLIC_TOKEN_SWAPPER_ADDRESS`: Deployed contract address (see below)
+   
+   Optional variables (chains have built-in RPC endpoints):
+   - `NEXT_PUBLIC_INFURA_KEY`: Your Infura API key for Ethereum/Optimism
+   - `NEXT_PUBLIC_ALCHEMY_KEY`: Your Alchemy API key for enhanced performance
 
 4. Run the development server:
    ```bash
@@ -84,44 +88,101 @@ npm run test:e2e
 npm run test:contracts
 ```
 
-## Deployment
+## Frontend Deployment
 
-### Vercel/Netlify
-1. Push your code to GitHub.
-2. Connect your repository to Vercel or Netlify.
-3. Set environment variables in the deployment platform.
+### Vercel (Recommended)
+
+1. **Install Vercel CLI**:
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Deploy to Vercel**:
+   ```bash
+   vercel
+   ```
+
+3. **Set Environment Variables** in Vercel Dashboard:
+   ```
+   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
+   NEXT_PUBLIC_TOKEN_SWAPPER_ADDRESS=0x85e3569ef3DDEE12Bb68772d2Cf73612e82e39Ea
+   ```
+
+4. **Production Deployment**:
+   ```bash
+   vercel --prod
+   ```
+
+### Alternative: Netlify
+
+1. Push your code to GitHub
+2. Connect repository to Netlify
+3. Set environment variables in Netlify Dashboard:
+   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`
+   - `NEXT_PUBLIC_TOKEN_SWAPPER_ADDRESS`
 4. Deploy!
 
-### Testnet Deployment
-For Base Sepolia testnet deployment:
-1. Add your private key to `.env.local` as `PRIVATE_KEY`.
-2. Use Hardhat or similar to deploy contracts if needed.
-3. Update RPC URLs for Base Sepolia.
+### Environment Variables for Production
+
+**Required**:
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`: Get from https://cloud.walletconnect.com
+- `NEXT_PUBLIC_TOKEN_SWAPPER_ADDRESS`: Deployed contract address
+
+**Optional** (for custom RPC endpoints):
+- `NEXT_PUBLIC_INFURA_KEY`: Infura project key
+- `NEXT_PUBLIC_ALCHEMY_KEY`: Alchemy API key
 
 ## Smart Contracts
 
-The project includes Solidity contracts for enhanced swap functionality:
+The project includes Solidity contracts for token swapping using Uniswap V3:
 
 ### Contracts
-- **TokenSwapper.sol**: Main swap contract using Uniswap V3
-- **MockERC20.sol**: Test token contract for development
+- **TokenSwapper.sol**: Main swap contract integrating Uniswap V3 Router
+  - Supports swaps between any ERC20 tokens
+  - Configurable slippage and deadline
+  - Owner-controlled emergency withdrawals
+- **MockERC20.sol**: Test token contract for local development
 
-### Contract Deployment
+### Deployed Contracts
 
 #### Base Sepolia Testnet
+- **TokenSwapper**: `0x85e3569ef3DDEE12Bb68772d2Cf73612e82e39Ea`
+- **Uniswap V3 Router**: `0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4`
+- **Network**: Base Sepolia (Chain ID: 84532)
+- **Explorer**: https://sepolia.basescan.org/address/0x85e3569ef3DDEE12Bb68772d2Cf73612e82e39Ea
+
+### Contract Deployment Guide
+
+The contracts are deployed using Hardhat. To deploy to a new network:
+
+#### Prerequisites
+1. Create a `contracts/.env` file with your private key:
+   ```bash
+   PRIVATE_KEY=0xyour_private_key_here
+   basescan_api_key=your_basescan_api_key_here
+   ```
+   **⚠️ NEVER commit this file to git!**
+
+2. Ensure you have testnet ETH (for Base Sepolia, get from https://faucet.quicknode.com/base/sepolia)
+
+#### Deploy to Base Sepolia
 ```bash
-# Set your private key in .env.local
+npm run compile           # Compile contracts
 npm run deploy:base-sepolia
 ```
 
-#### Base Mainnet
+#### Deploy to Base Mainnet
 ```bash
 npm run deploy:base
 ```
 
-### Contract Addresses (after deployment)
-- TokenSwapper: `TBD`
-- Update `src/lib/contracts.ts` with deployed addresses
+#### After Deployment
+1. Copy the deployed contract address from the console output
+2. Update `.env.local`:
+   ```
+   NEXT_PUBLIC_TOKEN_SWAPPER_ADDRESS=0xYourDeployedAddress
+   ```
+3. The contract will be automatically verified on Basescan if configured correctly
 
 ## Project Structure
 
@@ -155,10 +216,21 @@ npm run deploy:base
 
 ## Supported Networks
 
-- Ethereum Mainnet
-- Optimism
-- Base Sepolia (testnet)
-- Base Mainnet
+The dApp supports the following blockchain networks:
+
+| Network | Chain ID | Status | Purpose |
+|---------|----------|--------|---------|
+| Ethereum Mainnet | 1 | ✅ Active | Production swaps |
+| Optimism | 10 | ✅ Active | L2 production swaps |
+| Base | 8453 | ✅ Active | L2 production swaps |
+| Base Sepolia | 84532 | ✅ Active | Testing (current deployment) |
+
+### Network Configuration
+
+All networks are pre-configured in `src/app/providers.tsx`. The dApp will automatically:
+- Prompt users to switch networks if on unsupported chain
+- Use default RPC endpoints (or custom if configured)
+- Show appropriate block explorers for transaction links
 
 ## Security Notes
 

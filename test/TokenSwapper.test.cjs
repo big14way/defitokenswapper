@@ -1,6 +1,6 @@
-import { expect } from "chai";
-import { ethers } from "hardhat";
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
+const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("TokenSwapper", function () {
   async function deploySwapperFixture() {
@@ -50,6 +50,24 @@ describe("TokenSwapper", function () {
     });
   });
 
-  // Note: Actual swap testing would require a deployed DEX router on the test network
-  // For Base Sepolia, we'd need to check if Uniswap V3 is deployed there
+  describe("Swaps", function () {
+    it("Should revert swap with invalid router", async function () {
+      const { swapper, tokenA, tokenB, user } = await loadFixture(deploySwapperFixture);
+
+      // Approve tokens
+      await tokenA.connect(user).approve(swapper.target, ethers.parseEther("100"));
+
+      // Try to swap - should revert because router is ZeroAddress
+      await expect(
+        swapper.connect(user).swapExactInputSingle(
+          tokenA.target,
+          tokenB.target,
+          3000, // 0.3% fee
+          ethers.parseEther("10"),
+          ethers.parseEther("9"), // minimum output
+          Math.floor(Date.now() / 1000) + 3600 // deadline
+        )
+      ).to.be.reverted; // Should revert because router is not set properly
+    });
+  });
 });
