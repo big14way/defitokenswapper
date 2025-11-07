@@ -1,0 +1,44 @@
+{
+  "name": "defitokenswapper",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint",
+    "test": "jest",
+    "test:e2e": "cypress run"
+  },
+  "dependencies": {
+  "react": "19.2.0",
+  "react-dom": "19.2.0",
+  "next": "16.0.1",
+    "@reown/appkit": "1.8.12",
+    "@reown/appkit-adapter-wagmi": "^1.8.12",
+    "@walletconnect/core": "^2.23.0",
+    "@walletconnect/utils": "^2.23.0",
+    "wagmi": "^2",
+    "viem": "^2",
+    "@uniswap/v3-sdk": "^3.10.0",
+    "@tanstack/react-query": "^5",
+    "@shadcn/ui": "^0.0.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.292.0",
+    "tailwind-merge": "^2.0.0"
+  },
+  "devDependencies": {
+  "typescript": "^5",
+  "@types/node": "^20",
+  "@types/react": "^19",
+  "@types/react-dom": "^19",
+  "@tailwindcss/postcss": "^4",
+  "tailwindcss": "^4",
+  "eslint": "^9",
+  "eslint-config-next": "16.0.1",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.8",
+    "cypress": "^13.6.0"
+  }
+}
