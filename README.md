@@ -69,7 +69,7 @@ A modern DeFi token swapping dApp built with Next.js 14, TypeScript, and integra
 
 ## Testing
 
-### Unit Tests
+### Unit Tests (Frontend)
 ```bash
 npm test
 ```
@@ -77,6 +77,11 @@ npm test
 ### End-to-End Tests
 ```bash
 npm run test:e2e
+```
+
+### Smart Contract Tests
+```bash
+npm run test:contracts
 ```
 
 ## Deployment
@@ -93,30 +98,67 @@ For Base Sepolia testnet deployment:
 2. Use Hardhat or similar to deploy contracts if needed.
 3. Update RPC URLs for Base Sepolia.
 
+## Smart Contracts
+
+The project includes Solidity contracts for enhanced swap functionality:
+
+### Contracts
+- **TokenSwapper.sol**: Main swap contract using Uniswap V3
+- **MockERC20.sol**: Test token contract for development
+
+### Contract Deployment
+
+#### Base Sepolia Testnet
+```bash
+# Set your private key in .env.local
+npm run deploy:base-sepolia
+```
+
+#### Base Mainnet
+```bash
+npm run deploy:base
+```
+
+### Contract Addresses (after deployment)
+- TokenSwapper: `TBD`
+- Update `src/lib/contracts.ts` with deployed addresses
+
 ## Project Structure
 
 ```
-src/
-├── app/
-│   ├── layout.tsx          # Root layout with providers
-│   ├── page.tsx            # Main swap page
-│   └── providers.tsx       # Wagmi and QueryClient providers
-├── components/
-│   ├── SwapForm.tsx        # Main swap form component
-│   ├── TokenSelector.tsx   # Token dropdown selector
-│   ├── TxButton.tsx        # Transaction button with loading
-│   └── History.tsx         # Swap history display
-├── lib/
-│   ├── utils.ts            # Utility functions
-│   └── contracts.ts        # Contract ABIs and addresses
-└── __tests__/
-    └── utils.test.ts       # Unit tests
+/
+├── contracts/          # Solidity contracts
+│   ├── TokenSwapper.sol
+│   └── MockERC20.sol
+├── scripts/            # Deployment scripts
+│   └── deploy.js
+├── test/               # Contract tests
+│   └── TokenSwapper.test.js
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx          # Root layout with providers
+│   │   ├── page.tsx            # Main swap page
+│   │   └── providers.tsx       # Wagmi and QueryClient providers
+│   ├── components/
+│   │   ├── SwapForm.tsx        # Main swap form component
+│   │   ├── TokenSelector.tsx   # Token dropdown selector
+│   │   ├── TxButton.tsx        # Transaction button with loading
+│   │   └── History.tsx         # Swap history display
+│   ├── lib/
+│   │   ├── utils.ts            # Utility functions
+│   │   └── contracts.ts        # Contract ABIs and addresses
+│   └── __tests__/
+│       └── utils.test.ts       # Unit tests
+├── hardhat.config.cjs  # Hardhat configuration
+└── package.json
 ```
 
 ## Supported Networks
 
 - Ethereum Mainnet
 - Optimism
+- Base Sepolia (testnet)
+- Base Mainnet
 
 ## Security Notes
 
