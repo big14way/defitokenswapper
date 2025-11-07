@@ -7,7 +7,7 @@ import TokenSelector from "./TokenSelector";
 import TxButton from "./TxButton";
 import { erc20Abi } from "viem";
 import { getSwapQuote } from "@/lib/utils";
-import { swapRouterAbi, UNISWAP_ROUTER_ADDRESS } from "@/lib/contracts";
+import { tokenSwapperAbi, TOKEN_SWAPPER_ADDRESS } from "@/lib/contracts";
 
 // Hardcoded tokens
 const TOKENS = [
@@ -51,8 +51,10 @@ export default function SwapForm() {
     address: fromToken.address as `0x${string}`,
     abi: erc20Abi,
     functionName: "allowance",
-    args: [address!, "0xE592427A0AEce92De3Edee1F18E0157C05861564"], // Uniswap V3 Router
-    enabled: isConnected && fromToken.address !== "0x0000000000000000000000000000000000000000",
+    args: [address!, TOKEN_SWAPPER_ADDRESS as `0x${string}`], // TokenSwapper Contract
+    query: {
+      enabled: isConnected && fromToken.address !== "0x0000000000000000000000000000000000000000",
+    },
   });
 
   const { writeContract, isPending } = useWriteContract();
@@ -60,23 +62,18 @@ export default function SwapForm() {
   const handleSwap = () => {
     if (!amount) return;
 
-    // For simplicity, assume direct swap via router
-    // In reality, use Uniswap SDK to construct the path and call
+    // Call TokenSwapper contract which wraps Uniswap V3
     writeContract({
-      address: UNISWAP_ROUTER_ADDRESS as `0x${string}`,
-      abi: swapRouterAbi,
-      functionName: "exactInputSingle",
+      address: TOKEN_SWAPPER_ADDRESS as `0x${string}`,
+      abi: tokenSwapperAbi,
+      functionName: "swapExactInputSingle",
       args: [
-        {
-          tokenIn: fromToken.address,
-          tokenOut: toToken.address,
-          fee: 3000, // 0.3%
-          recipient: address,
-          deadline: Math.floor(Date.now() / 1000) + deadline * 60, // Custom deadline
-          amountIn: parseEther(amount),
-          amountOutMinimum: parseEther(quote || "0") * BigInt(1000 - slippage * 10) / BigInt(1000), // Custom slippage
-          sqrtPriceLimitX96: 0,
-        },
+        fromToken.address as `0x${string}`,
+        toToken.address as `0x${string}`,
+        3000, // 0.3% fee tier
+        parseEther(amount),
+        parseEther(quote || "0") * BigInt(1000 - slippage * 10) / BigInt(1000), // Custom slippage
+        Math.floor(Date.now() / 1000) + deadline * 60, // Custom deadline
       ],
     });
   };
@@ -86,7 +83,7 @@ export default function SwapForm() {
       address: fromToken.address as `0x${string}`,
       abi: erc20Abi,
       functionName: "approve",
-      args: ["0xE592427A0AEce92De3Edee1F18E0157C05861564", parseEther(amount)],
+      args: [TOKEN_SWAPPER_ADDRESS as `0x${string}`, parseEther(amount)],
     });
   };
 

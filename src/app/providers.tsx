@@ -11,17 +11,17 @@ const queryClient = new QueryClient();
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "1eebe528ca0ce94a99ceaa2e915058d7";
 
-// Configure supported chains
-const supportedChains = [mainnet, optimism, base, baseSepolia];
+// Configure supported chains - use as const to preserve tuple type
+const supportedChains = [mainnet, optimism, base, baseSepolia] as const;
 
 const wagmiAdapter = new WagmiAdapter({
   projectId,
-  networks: supportedChains,
+  networks: supportedChains as any,
 });
 
 createAppKit({
   adapters: [wagmiAdapter],
-  networks: supportedChains,
+  networks: supportedChains as any,
   projectId,
   features: {
     analytics: true,
